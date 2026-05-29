@@ -7,7 +7,7 @@ exports.getEmployees = async (req, res) => {
   try {
     const employees = await prisma.employee.findMany({
       orderBy: {
-        createdAt: "desc",
+        id: "desc",
       },
     });
 
@@ -30,8 +30,8 @@ exports.createEmployee = async (req, res) => {
       department,
       jobTitle,
       salary,
-      joiningDate,
-      status,
+      dateOfJoining,
+      isActive,
     } = req.body;
 
     const employee = await prisma.employee.create({
@@ -42,8 +42,10 @@ exports.createEmployee = async (req, res) => {
         department,
         jobTitle,
         salary: Number(salary),
-        joiningDate: joiningDate ? new Date(joiningDate) : null,
-        status,
+        dateOfJoining: dateOfJoining
+          ? new Date(dateOfJoining)
+          : null,
+        isActive: isActive ?? true,
       },
     });
 
@@ -65,15 +67,30 @@ exports.updateEmployee = async (req, res) => {
       return res.status(400).json({ message: "Invalid employee ID" });
     }
 
-    const { fullName, jobTitle, country, salary } = req.body;
+    const {
+      fullName,
+      email,
+      country,
+      department,
+      jobTitle,
+      salary,
+      dateOfJoining,
+      isActive,
+    } = req.body;
 
     const employee = await prisma.employee.update({
       where: { id },
       data: {
         fullName,
-        jobTitle,
+        email,
         country,
-        salary: Number(salary),
+        department,
+        jobTitle,
+        salary: salary ? Number(salary) : undefined,
+        dateOfJoining: dateOfJoining
+          ? new Date(dateOfJoining)
+          : undefined,
+        isActive,
       },
     });
 
@@ -112,7 +129,7 @@ exports.deleteEmployee = async (req, res) => {
 };
 
 /* =========================
-   SALARY INSIGHTS (DASHBOARD)
+   SALARY INSIGHTS
 ========================= */
 exports.getSalaryInsights = async (req, res) => {
   try {
