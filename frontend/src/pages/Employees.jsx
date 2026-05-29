@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import API from "../api/axios";
-import axios from "axios";
 import EmployeeForm from "../components/EmployeeForm";
 import EmployeeTable from "../components/EmployeeTable";
 
 function Employees() {
   const [employees, setEmployees] = useState([]);
 
-  // ✅ EDIT STATES (MISSING IN YOUR CODE)
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -22,36 +20,42 @@ function Employees() {
 
   const fetchEmployees = async () => {
     try {
-      const res = await API.get("/api/employees");
+      const res = await API.get("/employees");
       setEmployees(res.data);
     } catch (err) {
-      console.log("ERROR:", err);
+      console.log("FETCH ERROR:", err.response?.data || err.message);
     }
   };
 
   const addEmployee = async (data) => {
-    await API.post("/employees", data);
-    fetchEmployees();
+    try {
+      await API.post("/employees", data);
+      fetchEmployees();
+    } catch (err) {
+      console.log("ADD ERROR:", err.response?.data || err.message);
+    }
   };
 
   const deleteEmployee = async (id) => {
-    await API.delete(`/employees/${id}`);
-    fetchEmployees();
+    try {
+      await API.delete(`/employees/${id}`);
+      fetchEmployees();
+    } catch (err) {
+      console.log("DELETE ERROR:", err.response?.data || err.message);
+    }
   };
 
-  // ✅ EDIT
   const handleEdit = (emp) => {
     setSelectedEmployee(emp);
 
     setFormData({
-      fullName: emp.fullName,
-      jobTitle: emp.jobTitle,
-      country: emp.country,
-      salary: emp.salary,
+      fullName: emp.fullName || "",
+      jobTitle: emp.jobTitle || "",
+      country: emp.country || "",
+      salary: emp.salary || ""
     });
   };
 
-  // ✅ CHANGE INPUT
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -59,13 +63,9 @@ function Employees() {
     });
   };
 
-  // ✅ UPDATE
   const handleUpdate = async () => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/employees/${selectedEmployee.id}`,
-        formData
-      );
+      await API.put(`/employees/${selectedEmployee.id}`, formData);
 
       alert("Employee updated successfully");
 
@@ -73,7 +73,7 @@ function Employees() {
       setSelectedEmployee(null);
 
     } catch (error) {
-      console.log(error);
+      console.log("UPDATE ERROR:", error.response?.data || error.message);
     }
   };
 
@@ -85,7 +85,6 @@ function Employees() {
         <EmployeeForm onSubmit={addEmployee} />
       </div>
 
-      {/* ✅ EDIT FORM */}
       {selectedEmployee && (
         <div className="card">
           <h3>Edit Employee</h3>
@@ -103,7 +102,7 @@ function Employees() {
         <EmployeeTable
           employees={employees}
           handleDelete={deleteEmployee}
-          handleEdit={handleEdit}   // ✅ IMPORTANT
+          handleEdit={handleEdit}
         />
       </div>
     </div>

@@ -69,7 +69,7 @@ exports.updateEmployee = async (req, res) => {
         fullName,
         jobTitle,
         country,
-        salary: salary ? Number(salary) : 0,
+        salary: Number(salary),
       },
     });
 
