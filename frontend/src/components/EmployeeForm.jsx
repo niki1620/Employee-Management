@@ -1,33 +1,35 @@
 import { useState } from "react";
 
-function EmployeeForm({
-  onSubmit,
-}) {
-  const [formData, setFormData] =
-    useState({
-      fullName: "",
-      email: "",
-      country: "",
-      department: "",
-      jobTitle: "",
-      salary: "",
-      joiningDate: "",
-      status: "ACTIVE",
-    });
+function EmployeeForm({ onSubmit }) {
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    country: "",
+    department: "",
+    jobTitle: "",
+    salary: "",
+    dateOfJoining: "",
+    isActive: true
+  });
 
   const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]:
-        e.target.value,
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    onSubmit(formData);
+    onSubmit({
+      ...formData,
+      salary: Number(formData.salary),
+    });
 
+    // reset form
     setFormData({
       fullName: "",
       email: "",
@@ -35,8 +37,8 @@ function EmployeeForm({
       department: "",
       jobTitle: "",
       salary: "",
-      joiningDate: "",
-      status: "ACTIVE",
+      dateOfJoining: "",
+      isActive: true
     });
   };
 
@@ -93,31 +95,23 @@ function EmployeeForm({
 
         <input
           type="date"
-          name="joiningDate"
-          value={
-            formData.joiningDate
-          }
+          name="dateOfJoining"
+          value={formData.dateOfJoining}
           onChange={handleChange}
         />
 
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-        >
-          <option value="ACTIVE">
-            ACTIVE
-          </option>
-
-          <option value="INACTIVE">
-            INACTIVE
-          </option>
-        </select>
+        <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <input
+            type="checkbox"
+            name="isActive"
+            checked={formData.isActive}
+            onChange={handleChange}
+          />
+          Active
+        </label>
       </div>
 
-      <button type="submit">
-        Add Employee
-      </button>
+      <button type="submit">Add Employee</button>
     </form>
   );
 }
