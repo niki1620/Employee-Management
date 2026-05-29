@@ -8,7 +8,7 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://employee-management-jet-nu.vercel.app/"
+    "https://employee-management-jet-nu.vercel.app"
   ],
   credentials: true
 }));
