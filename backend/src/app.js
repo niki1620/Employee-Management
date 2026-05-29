@@ -5,7 +5,13 @@ const employeeRoutes = require("./routes/employeeRoutes");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://your-vercel-app.vercel.apphttps://employee-management-5jmacl94h-nikitha-s-s-projects.vercel.app/"
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // Root route (FIX)

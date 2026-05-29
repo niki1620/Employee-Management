@@ -1,26 +1,27 @@
 const prisma = require("../config/db");
 
+/* =========================
+   GET ALL EMPLOYEES
+========================= */
 exports.getEmployees = async (req, res) => {
   try {
-    const employees =
-      await prisma.employee.findMany({
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
+    const employees = await prisma.employee.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
     res.json(employees);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    console.error("GET EMPLOYEES ERROR:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 
-exports.createEmployee = async (
-  req,
-  res
-) => {
+/* =========================
+   CREATE EMPLOYEE
+========================= */
+exports.createEmployee = async (req, res) => {
   try {
     const {
       fullName,
@@ -33,33 +34,36 @@ exports.createEmployee = async (
       status,
     } = req.body;
 
-    const employee =
-      await prisma.employee.create({
-        data: {
-          fullName,
-          email,
-          country,
-          department,
-          jobTitle,
-          salary: Number(salary),
-          joiningDate: new Date(
-            joiningDate
-          ),
-          status,
-        },
-      });
+    const employee = await prisma.employee.create({
+      data: {
+        fullName,
+        email,
+        country,
+        department,
+        jobTitle,
+        salary: Number(salary),
+        joiningDate: joiningDate ? new Date(joiningDate) : null,
+        status,
+      },
+    });
 
     res.status(201).json(employee);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    console.error("CREATE EMPLOYEE ERROR:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 
+/* =========================
+   UPDATE EMPLOYEE
+========================= */
 exports.updateEmployee = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = Number(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid employee ID" });
+    }
 
     const { fullName, jobTitle, country, salary } = req.body;
 
@@ -77,78 +81,71 @@ exports.updateEmployee = async (req, res) => {
       message: "Employee updated successfully",
       data: employee,
     });
-
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      message: error.message,
-    });
+    console.error("UPDATE EMPLOYEE ERROR:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 
-exports.deleteEmployee = async (
-  req,
-  res
-) => {
+/* =========================
+   DELETE EMPLOYEE
+========================= */
+exports.deleteEmployee = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = Number(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid employee ID" });
+    }
 
     await prisma.employee.delete({
-      where: {
-        id: id,
-      },
+      where: { id },
     });
 
     res.json({
-      message:
-        "Employee deleted successfully",
+      message: "Employee deleted successfully",
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    console.error("DELETE EMPLOYEE ERROR:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 
-exports.getSalaryInsights = async (
-  req,
-  res
-) => {
+/* =========================
+   SALARY INSIGHTS (DASHBOARD)
+========================= */
+exports.getSalaryInsights = async (req, res) => {
   try {
-    const employees =
-      await prisma.employee.findMany();
+    const employees = await prisma.employee.findMany();
 
-    const total =
-      employees.reduce(
-        (sum, emp) => sum + emp.salary,
-        0
-      );
+    const totalEmployees = employees.length;
 
-    const avgSalary =
-      employees.length > 0
-        ? total / employees.length
-        : 0;
+    if (totalEmployees === 0) {
+      return res.json({
+        totalEmployees: 0,
+        averageSalary: 0,
+        maxSalary: 0,
+        minSalary: 0,
+      });
+    }
 
-    const maxSalary = Math.max(
-      ...employees.map((e) => e.salary)
-    );
+    const salaries = employees.map((e) => e.salary);
 
-    const minSalary = Math.min(
-      ...employees.map((e) => e.salary)
-    );
+    const total = salaries.reduce((sum, s) => sum + s, 0);
+
+    const averageSalary = total / totalEmployees;
+
+    const maxSalary = Math.max(...salaries);
+    const minSalary = Math.min(...salaries);
 
     res.json({
-      totalEmployees:
-        employees.length,
-      averageSalary:
-        avgSalary.toFixed(2),
+      totalEmployees,
+      averageSalary: averageSalary.toFixed(2),
       maxSalary,
       minSalary,
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    console.error("SALARY INSIGHTS ERROR:", error);
+    res.status(500).json({ message: error.message });
   }
 };
