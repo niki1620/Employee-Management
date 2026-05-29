@@ -5,13 +5,18 @@ import EmployeeTable from "../components/EmployeeTable";
 
 function Employees() {
   const [employees, setEmployees] = useState([]);
-
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  // ✅ FIX: include ALL backend-required fields
   const [formData, setFormData] = useState({
     fullName: "",
-    jobTitle: "",
+    email: "",
     country: "",
-    salary: ""
+    department: "",
+    jobTitle: "",
+    salary: "",
+    dateOfJoining: "",
+    isActive: true
   });
 
   useEffect(() => {
@@ -50,16 +55,24 @@ function Employees() {
 
     setFormData({
       fullName: emp.fullName || "",
-      jobTitle: emp.jobTitle || "",
+      email: emp.email || "",
       country: emp.country || "",
-      salary: emp.salary || ""
+      department: emp.department || "",
+      jobTitle: emp.jobTitle || "",
+      salary: emp.salary || "",
+      dateOfJoining: emp.dateOfJoining
+        ? emp.dateOfJoining.split("T")[0]
+        : "",
+      isActive: emp.isActive ?? true
     });
   };
 
   const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
@@ -71,7 +84,6 @@ function Employees() {
 
       fetchEmployees();
       setSelectedEmployee(null);
-
     } catch (error) {
       console.log("UPDATE ERROR:", error.response?.data || error.message);
     }
@@ -90,9 +102,28 @@ function Employees() {
           <h3>Edit Employee</h3>
 
           <input name="fullName" value={formData.fullName} onChange={handleChange} />
-          <input name="jobTitle" value={formData.jobTitle} onChange={handleChange} />
+          <input name="email" value={formData.email} onChange={handleChange} />
           <input name="country" value={formData.country} onChange={handleChange} />
+          <input name="department" value={formData.department} onChange={handleChange} />
+          <input name="jobTitle" value={formData.jobTitle} onChange={handleChange} />
           <input name="salary" value={formData.salary} onChange={handleChange} />
+
+          <input
+            type="date"
+            name="dateOfJoining"
+            value={formData.dateOfJoining}
+            onChange={handleChange}
+          />
+
+          <label>
+            <input
+              type="checkbox"
+              name="isActive"
+              checked={formData.isActive}
+              onChange={handleChange}
+            />
+            Active
+          </label>
 
           <button onClick={handleUpdate}>Update</button>
         </div>
