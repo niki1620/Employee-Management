@@ -8,9 +8,9 @@
   "license": "ISC",
   "type": "commonjs",
   "scripts": {
-    "dev": "prisma generate && nodemon src/server.js",
-    "start": "node src/server.js"
-  },
+  "dev": "nodemon src/server.js",
+  "start": "node src/server.js"
+}
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^3.0.3",
