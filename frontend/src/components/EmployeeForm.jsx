@@ -8,16 +8,14 @@ function EmployeeForm({ onSubmit }) {
     department: "",
     jobTitle: "",
     salary: "",
-    dateOfJoining: "",
-    isActive: true
+    joiningDate: "",
+    status: "ACTIVE"
   });
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value,
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -29,7 +27,6 @@ function EmployeeForm({ onSubmit }) {
       salary: Number(formData.salary),
     });
 
-    // reset form
     setFormData({
       fullName: "",
       email: "",
@@ -37,14 +34,15 @@ function EmployeeForm({ onSubmit }) {
       department: "",
       jobTitle: "",
       salary: "",
-      dateOfJoining: "",
-      isActive: true
+      joiningDate: "",
+      status: "ACTIVE"
     });
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="form-grid">
+
         <input
           type="text"
           name="fullName"
@@ -95,23 +93,30 @@ function EmployeeForm({ onSubmit }) {
 
         <input
           type="date"
-          name="dateOfJoining"
-          value={formData.dateOfJoining}
+          name="joiningDate"
+          value={formData.joiningDate}
           onChange={handleChange}
         />
 
-        <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          <input
-            type="checkbox"
-            name="isActive"
-            checked={formData.isActive}
-            onChange={handleChange}
-          />
-          Active
-        </label>
+        <select
+          name="status"
+          value={formData.status}
+          onChange={handleChange}
+        >
+          <option value="ACTIVE">
+            ACTIVE
+          </option>
+
+          <option value="INACTIVE">
+            INACTIVE
+          </option>
+        </select>
+
       </div>
 
-      <button type="submit">Add Employee</button>
+      <button type="submit">
+        Add Employee
+      </button>
     </form>
   );
 }

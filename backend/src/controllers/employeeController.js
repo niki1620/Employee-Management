@@ -30,8 +30,8 @@ exports.createEmployee = async (req, res) => {
       department,
       jobTitle,
       salary,
-      dateOfJoining,
-      isActive,
+      joiningDate,
+      status,
     } = req.body;
 
     const employee = await prisma.employee.create({
@@ -42,10 +42,10 @@ exports.createEmployee = async (req, res) => {
         department,
         jobTitle,
         salary: Number(salary),
-        dateOfJoining: dateOfJoining
-          ? new Date(dateOfJoining)
+        joiningDate: joiningDate
+          ? new Date(joiningDate)
           : null,
-        isActive: isActive ?? true,
+        status,
       },
     });
 
@@ -64,7 +64,9 @@ exports.updateEmployee = async (req, res) => {
     const id = Number(req.params.id);
 
     if (isNaN(id)) {
-      return res.status(400).json({ message: "Invalid employee ID" });
+      return res.status(400).json({
+        message: "Invalid employee ID",
+      });
     }
 
     const {
@@ -74,8 +76,8 @@ exports.updateEmployee = async (req, res) => {
       department,
       jobTitle,
       salary,
-      dateOfJoining,
-      isActive,
+      joiningDate,
+      status,
     } = req.body;
 
     const employee = await prisma.employee.update({
@@ -86,11 +88,13 @@ exports.updateEmployee = async (req, res) => {
         country,
         department,
         jobTitle,
-        salary: salary ? Number(salary) : undefined,
-        dateOfJoining: dateOfJoining
-          ? new Date(dateOfJoining)
+        salary: salary
+          ? Number(salary)
           : undefined,
-        isActive,
+        joiningDate: joiningDate
+          ? new Date(joiningDate)
+          : undefined,
+        status,
       },
     });
 
@@ -98,6 +102,7 @@ exports.updateEmployee = async (req, res) => {
       message: "Employee updated successfully",
       data: employee,
     });
+
   } catch (error) {
     console.error("UPDATE EMPLOYEE ERROR:", error);
     res.status(500).json({ message: error.message });
@@ -112,7 +117,9 @@ exports.deleteEmployee = async (req, res) => {
     const id = Number(req.params.id);
 
     if (isNaN(id)) {
-      return res.status(400).json({ message: "Invalid employee ID" });
+      return res.status(400).json({
+        message: "Invalid employee ID",
+      });
     }
 
     await prisma.employee.delete({
@@ -122,6 +129,7 @@ exports.deleteEmployee = async (req, res) => {
     res.json({
       message: "Employee deleted successfully",
     });
+
   } catch (error) {
     console.error("DELETE EMPLOYEE ERROR:", error);
     res.status(500).json({ message: error.message });
@@ -133,9 +141,11 @@ exports.deleteEmployee = async (req, res) => {
 ========================= */
 exports.getSalaryInsights = async (req, res) => {
   try {
-    const employees = await prisma.employee.findMany();
+    const employees =
+      await prisma.employee.findMany();
 
-    const totalEmployees = employees.length;
+    const totalEmployees =
+      employees.length;
 
     if (totalEmployees === 0) {
       return res.json({
@@ -146,23 +156,37 @@ exports.getSalaryInsights = async (req, res) => {
       });
     }
 
-    const salaries = employees.map((e) => e.salary);
+    const salaries =
+      employees.map((e) => e.salary);
 
-    const total = salaries.reduce((sum, s) => sum + s, 0);
+    const total =
+      salaries.reduce((sum, s) => sum + s, 0);
 
-    const averageSalary = total / totalEmployees;
+    const averageSalary =
+      total / totalEmployees;
 
-    const maxSalary = Math.max(...salaries);
-    const minSalary = Math.min(...salaries);
+    const maxSalary =
+      Math.max(...salaries);
+
+    const minSalary =
+      Math.min(...salaries);
 
     res.json({
       totalEmployees,
-      averageSalary: averageSalary.toFixed(2),
+      averageSalary:
+        averageSalary.toFixed(2),
       maxSalary,
       minSalary,
     });
+
   } catch (error) {
-    console.error("SALARY INSIGHTS ERROR:", error);
-    res.status(500).json({ message: error.message });
+    console.error(
+      "SALARY INSIGHTS ERROR:",
+      error
+    );
+
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
